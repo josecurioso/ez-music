@@ -130,7 +130,7 @@ public class MainWindow implements ActionListener {
 			requestedURL = "https://www.youtube.com/playlist?list=PL9fZWvwimefsU-MruxuoWATNhP-wkF825";
 			savePath = "D:/Escritorio/Prueba";
 			requestedURL = textLink.getText();
-			//savePath = textPath.getText();
+			savePath = textPath.getText();
 	    	if(checkFields(requestedURL, savePath)){
 				buttonDownload.setEnabled(false);
 				textLink.setEnabled(false);
