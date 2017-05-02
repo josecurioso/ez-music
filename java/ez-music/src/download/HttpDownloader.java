@@ -12,10 +12,12 @@ public class HttpDownloader implements Runnable{
 	ArrayList<Thread> threads = new ArrayList<Thread>();
 	String requestedURL;
 	String savePath;
+	MainWindow window;
 	
-	public HttpDownloader(String requestedURL, String savePath){
+	public HttpDownloader(String requestedURL, String savePath, MainWindow window){
 		this.requestedURL = requestedURL;
 		this.savePath = savePath;
+		this.window = window;
 		
 	}
 
@@ -24,10 +26,9 @@ public class HttpDownloader implements Runnable{
 		try {
 			main(this.requestedURL, this.savePath);
 		} catch (JSONException | InterruptedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+		window.downloadFinished();
 	}
 	
 	public boolean main(String requestedURL, String savePath) throws JSONException, InterruptedException {
@@ -40,11 +41,9 @@ public class HttpDownloader implements Runnable{
 			for (String link : videoLinks) {
 				download(link, savePath);
 			}
-			///*
 			for (Thread t : this.threads){
 				t.join();
 			}
-			//*/
 		}
 		return true;
 	}

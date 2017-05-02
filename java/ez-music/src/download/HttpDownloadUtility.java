@@ -41,7 +41,6 @@ public class HttpDownloadUtility implements Runnable {
 	
 	
 	public int downloadFile(String fileURL, String saveDir, String fileName) throws IOException {
-		System.out.println(fileURL);
 		int contentLength = -1;
 		URL url = new URL(fileURL);
 		HttpURLConnection httpConn = (HttpURLConnection) url.openConnection();
@@ -64,10 +63,24 @@ public class HttpDownloadUtility implements Runnable {
 					fileName = disposition.substring(index + 10, disposition.length() - 1);
 				}
 			}
+			
+			/*
+			System.out.println("####################################################################");
+			System.out.println("Download URL = " + fileURL);
 			System.out.println("Content-Type = " + contentType);
 			System.out.println("Content-Disposition = " + disposition);
 			System.out.println("Content-Length = " + contentLength);
 			System.out.println("fileName = " + fileName);
+			System.out.println("####################################################################");
+			*/
+
+			System.out.print("####################################################################\n"
+			+ "Download URL = " + fileURL + "\n"
+			+ "Content-Type = " + contentType + "\n"
+			+ "Content-Disposition = " + disposition + "\n"
+			+ "Content-Length = " + contentLength + "\n"
+			+ "fileName = " + fileName + "\n"
+			+ "####################################################################\n");
 
 			// opens input stream from the HTTP connection
 			InputStream inputStream = httpConn.getInputStream();
