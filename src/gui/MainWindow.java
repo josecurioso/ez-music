@@ -16,8 +16,9 @@ import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.text.DefaultCaret;
 
-import download.CustomOutputStream;
-import download.HttpDownloader;
+import legacy.HttpDownloader;
+import logic.CustomOutputStream;
+import logic.Logic;
 
 import java.awt.Color;
 import javax.swing.border.LineBorder;
@@ -36,6 +37,7 @@ public class MainWindow implements ActionListener {
 	PrintStream standardErr = System.err;
 
 	private JTextArea textArea;
+	
 
 	/**
 	 * Launch the application.
@@ -75,8 +77,7 @@ public class MainWindow implements ActionListener {
 
 		frmEzmusic = new JFrame();
 		frmEzmusic.setResizable(false);
-		frmEzmusic.setIconImage(
-				Toolkit.getDefaultToolkit().getImage(MainWindow.class.getResource("/download/256x256.png")));
+		//frmEzmusic.setIconImage(Toolkit.getDefaultToolkit().getImage(MainWindow.class.getResource("/download/256x256.png")));
 		frmEzmusic.setTitle("ez-music");
 		frmEzmusic.setBounds(100, 100, 615, 502);
 		frmEzmusic.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -149,9 +150,11 @@ public class MainWindow implements ActionListener {
 				textPath.setEnabled(false);
 				
 				System.out.println("Starting download, hold tight!");
-				Runnable downloader = new HttpDownloader(requestedURL, savePath, this);
-				Thread t = new Thread(downloader);
+				
+				Runnable logic = new Logic(requestedURL, savePath, this);
+				Thread t = new Thread(logic);
 				t.start();
+				
 				
 	    	}
 	    	else{
@@ -193,6 +196,6 @@ public class MainWindow implements ActionListener {
 		buttonDownload.setEnabled(true);
 		textLink.setEnabled(true);
 		textPath.setEnabled(true);
-		System.out.println("Download finished");
+		System.out.println("Proccess finished");
 	}
 }

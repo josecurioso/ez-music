@@ -1,4 +1,4 @@
-package download;
+package logic;
 
 import java.util.ArrayList;
 

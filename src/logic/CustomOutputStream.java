@@ -1,4 +1,4 @@
-package download;
+package logic;
  
 import java.io.IOException;
 import java.io.OutputStream;

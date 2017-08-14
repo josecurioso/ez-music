@@ -1,4 +1,4 @@
-package download;
+package legacy;
 
 import java.util.ArrayList;
 
@@ -6,6 +6,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import gui.MainWindow;
+import logic.JSONTools;
+import logic.YouTubeAPI;
 
 
 

@@ -1,4 +1,4 @@
-package download;
+package logic;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -7,40 +7,85 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+import org.json.JSONException;
+import org.json.JSONObject;
 
+public class Downloader implements Runnable{
 
-/**
- * A utility that downloads a file from a URL.
- * 
- * @author www.codejava.net
- *
- */
-public class HttpDownloadUtility implements Runnable {
-	private static final int BUFFER_SIZE = 4096;
-	private String fileURL;
-	private String saveDir;
-	private String fileName;
-
-	/**
-	 * Downloads a file from a URL
-	 * 
-	 * @param fileURL
-	 *            HTTP URL of the file to be downloaded
-	 * @param saveDir
-	 *            path of the directory to save the file
-	 * @param fileName
-	 *            desired name for the file
-	 * @throws IOException
-	 */
+	String videoURL;
+	String requestPATH;
 	
-	public HttpDownloadUtility(String fileURL, String saveDir, String fileName){
-		this.fileName = fileName;
-		this.fileURL = fileURL;
-		this.saveDir = saveDir;
+	public Downloader(String videoURL, String requestPATH){
+		this.videoURL = videoURL;
+		this.requestPATH = requestPATH;
+	}
+	
+	@Override
+	public void run() {		
+		//Try 2 options
+		try{
+			optionA(videoURL, requestPATH);
+		}
+		catch(FailedDownloadException e){
+			try{
+				optionB(videoURL, requestPATH);
+			}
+			catch(FailedDownloadException i){
+				System.out.println("File NOT downloaded on any try: " + videoURL);
+			}
+		}
+	}
+	
+	public void optionA(String videoURL, String requestPATH) throws FailedDownloadException{
+		JSONObject data = JSONTools.GET("http://www.youtubeinmp3.com/fetch/?format=JSON&video=" + videoURL);
+		String fileName = "";
+		String downloadURL = "";
+		try{
+			fileName = data.getString("title") + ".mp3";
+			downloadURL = data.getString("link");
+		}
+		catch(JSONException e){
+			throw new FailedDownloadException();
+		}
+		
+		try{
+			if(!downloadFile(downloadURL, requestPATH, fileName)){
+				throw new FailedDownloadException();
+			}
+		}
+		catch(IOException e){
+			
+		}
+		System.out.println("File downloaded on first try");
+		
+	}
+	
+	public void optionB(String videoURL, String requestPATH) throws FailedDownloadException{
+		JSONObject data = JSONTools.GET("http://www.youtubeinmp3.com/fetch/?format=JSON&video=" + videoURL);
+		String fileName = "";
+		String downloadURL = "";
+		try{
+			fileName = data.getString("title") + ".mp3";
+		}
+		catch(JSONException e){
+			throw new FailedDownloadException();
+		}
+		//downloadURL = //new method
+
+		try{
+			if(!downloadFile(downloadURL, requestPATH, fileName)){
+				throw new FailedDownloadException();
+			}
+		}
+		catch(IOException e){
+			
+		}
+		System.out.println("File downloaded on second try");
 	}
 	
 	
-	public int downloadFile(String fileURL, String saveDir, String fileName) throws IOException {
+	public boolean downloadFile(String fileURL, String saveDir, String fileName) throws IOException{
+		int BUFFER_SIZE = 4096;
 		int contentLength = -1;
 		URL url = new URL(fileURL);
 		HttpURLConnection httpConn = (HttpURLConnection) url.openConnection();
@@ -53,7 +98,8 @@ public class HttpDownloadUtility implements Runnable {
 			contentLength = httpConn.getContentLength();
 			
 			if(disposition == null){
-				throw new RuntimeException();
+				httpConn.disconnect();
+				return false;
 			}
 
 			else if (disposition != null && !isFilenameValid(fileName) && fileName != "") {
@@ -74,6 +120,7 @@ public class HttpDownloadUtility implements Runnable {
 			System.out.println("####################################################################");
 			*/
 
+			/*
 			System.out.print("####################################################################\n"
 			+ "Download URL = " + fileURL + "\n"
 			+ "Content-Type = " + contentType + "\n"
@@ -81,6 +128,8 @@ public class HttpDownloadUtility implements Runnable {
 			+ "Content-Length = " + contentLength + "\n"
 			+ "fileName = " + fileName + "\n"
 			+ "####################################################################\n");
+
+			 */
 
 			// opens input stream from the HTTP connection
 			InputStream inputStream = httpConn.getInputStream();
@@ -98,16 +147,18 @@ public class HttpDownloadUtility implements Runnable {
 			outputStream.close();
 			inputStream.close();
 			if(contentLength == -1){
-				System.out.println("Failed to download");
+				httpConn.disconnect();
+				return false;
 			}
 			else{
-				System.out.println("File downloaded");
+				httpConn.disconnect();
+				return true;
 			}
 		} else {
 			System.out.println("No file to download. Server replied HTTP code: " + responseCode);
+			httpConn.disconnect();
+			return false;
 		}
-		httpConn.disconnect();
-		return contentLength;
 	}
 
 	public boolean isFilenameValid(String file) {
@@ -118,28 +169,8 @@ public class HttpDownloadUtility implements Runnable {
 			return false;
 		}
 	}
-
-	public void entryPoint(String fileURL, String saveDir, String fileName) throws IOException {
-		int counter = 0;
-		try{
-			while ((counter < 3) && (downloadFile(fileURL, saveDir, fileName) == -1)) {
-				System.out.println("Otro intento");
-				counter++;
-			}
-		}
-		catch(Exception e){
-			System.out.println("Not Found");
-		}
-	}
-
-	@Override
-	public void run() {
-		try {
-			entryPoint(this.fileURL, this.saveDir, this.fileName);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-	}
+	
+	
+	
+	
 }
