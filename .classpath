@@ -11,5 +11,7 @@
 	<classpathentry kind="lib" path="libs/guava-21.0.jar"/>
 	<classpathentry kind="lib" path="libs/javax.json-api-1.0.jar"/>
 	<classpathentry kind="lib" path="libs/mail.jar"/>
+	<classpathentry kind="lib" path="libs/jid3lib-0.5.4.jar"/>
+	<classpathentry kind="lib" path="libs/jaudiotagger-2.2.3.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
