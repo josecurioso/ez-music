@@ -1,6 +1,7 @@
 package gui;
 
 import java.awt.EventQueue;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.PrintStream;
@@ -16,14 +17,13 @@ import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.text.DefaultCaret;
 
-import legacy.HttpDownloader;
 import logic.CustomOutputStream;
 import logic.Logic;
 
 import java.awt.Color;
 import javax.swing.border.LineBorder;
-import java.awt.Toolkit;
 import javax.swing.UIManager;
+import javax.swing.JToolBar;
 
 public class MainWindow implements ActionListener {
 
@@ -31,12 +31,17 @@ public class MainWindow implements ActionListener {
 	private JTextField textLink;
 	private JTextField textPath;
 	private JButton buttonDownload;
+	JButton btnAudio;
+	JButton btnVideo;
 	JTextArea textPanel;
 
 	PrintStream standardOut = System.out;
 	PrintStream standardErr = System.err;
+	
+	String mode = "audio";
 
 	private JTextArea textArea;
+	private JButton buttonClear;
 	
 
 	/**
@@ -77,7 +82,7 @@ public class MainWindow implements ActionListener {
 
 		frmEzmusic = new JFrame();
 		frmEzmusic.setResizable(false);
-		//frmEzmusic.setIconImage(Toolkit.getDefaultToolkit().getImage(MainWindow.class.getResource("/download/256x256.png")));
+		frmEzmusic.setIconImage(Toolkit.getDefaultToolkit().getImage(MainWindow.class.getResource("/gui/256x256.png")));
 		frmEzmusic.setTitle("ez-music");
 		frmEzmusic.setBounds(100, 100, 615, 502);
 		frmEzmusic.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -102,7 +107,7 @@ public class MainWindow implements ActionListener {
 		frmEzmusic.getContentPane().add(textPath);
 
 		buttonDownload = new JButton("Download");
-		buttonDownload.setBounds(146, 105, 299, 54);
+		buttonDownload.setBounds(86, 101, 430, 54);
 		buttonDownload.addActionListener(this);
 		buttonDownload.setActionCommand("download");
 		frmEzmusic.getContentPane().add(buttonDownload);
@@ -131,11 +136,46 @@ public class MainWindow implements ActionListener {
 
 		System.setOut(new PrintStream(new CustomOutputStream(textArea)));
 		System.setErr(new PrintStream(new CustomOutputStream(textArea)));
+		
+		JToolBar toolBar = new JToolBar();
+		toolBar.setBackground(Color.LIGHT_GRAY);
+		toolBar.setFloatable(false);
+		toolBar.setBounds(0, 0, 609, 16);
+		frmEzmusic.getContentPane().add(toolBar);
+		
+		btnAudio = new JButton("Audio");
+		btnAudio.addActionListener(this);
+		btnAudio.setActionCommand("audioSwitch");
+		toolBar.add(btnAudio);
+		
+		btnVideo = new JButton("Video");
+		btnVideo.addActionListener(this);
+		btnVideo.setActionCommand("videoSwitch");
+		toolBar.add(btnVideo);
+		
+		buttonClear = new JButton("Clear output");
+		buttonClear.addActionListener(this);
+		buttonClear.setActionCommand("clear");
+		buttonClear.setBounds(228, 450, 122, 23);
+		frmEzmusic.getContentPane().add(buttonClear);
 
 	}
 
 	@Override
 	public void actionPerformed(ActionEvent arg0) {
+		if("clear".equals(arg0.getActionCommand())){
+			textArea.setText(""); 
+		}
+		if("audioSwitch".equals(arg0.getActionCommand())){
+			mode = "audio";
+			textArea.setText(""); 
+			System.out.println("Now in " + mode + " mode");
+		}
+		if("videoSwitch".equals(arg0.getActionCommand())){
+			mode = "video";
+			textArea.setText(""); 
+			System.out.println("Now in " + mode + " mode");
+		}
 	    if ("download".equals(arg0.getActionCommand())) {
 	    	String requestedURL;
 			String savePath;
@@ -151,7 +191,7 @@ public class MainWindow implements ActionListener {
 				
 				System.out.println("Starting download, hold tight!");
 				
-				Runnable logic = new Logic(requestedURL, savePath, this);
+				Runnable logic = new Logic(requestedURL, savePath, mode, this);
 				Thread t = new Thread(logic);
 				t.start();
 				

@@ -12,11 +12,13 @@ public class Logic implements Runnable{
 	MainWindow window;
 	String requestURL;
 	String requestPATH;
+	String mode;
 
-	public Logic(String requestURL, String requestPATH, MainWindow window){
+	public Logic(String requestURL, String requestPATH, String mode, MainWindow window){
 		this.window = window;
 		this.requestURL = requestURL;
 		this.requestPATH = requestPATH;
+		this.mode = mode;
 		
 	}
 	
@@ -47,15 +49,27 @@ public class Logic implements Runnable{
 	}
 	
 	public void download(String videoURL, String requestPATH){
-		try{
-			Runnable r = new Downloader(videoURL, requestPATH);
-			Thread t = new Thread(r);
-			this.threads.add(t);
-			t.start();
-			r.run();
+		if(mode.equals("audio")){
+			try{
+				Runnable r = new DownloaderMP3(videoURL, requestPATH);
+				Thread t = new Thread(r);
+				this.threads.add(t);
+				t.start();
+			}
+			catch(Exception e){
+				e.printStackTrace();
+			}		
 		}
-		catch(Exception e){
-			e.printStackTrace();
-		}		
+		if(mode.equals("video")){
+			try{
+				Runnable r = new DownloaderMP4(videoURL, requestPATH);
+				Thread t = new Thread(r);
+				this.threads.add(t);
+				t.start();
+			}
+			catch(Exception e){
+				e.printStackTrace();
+			}		
+		}
 	}
 }
