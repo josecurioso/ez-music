@@ -14,17 +14,17 @@ import org.json.JSONObject;
 
 public class JSONTools {
 	
-	public static JSONObject GET(String URL){
+	public static JSONObject GET(String URL, Logger logger){
 		try{
     		JSONObject json = new JSONObject(IOUtils.toString(new URL(URL), Charset.forName("UTF-8")));
         	return json;
     	} catch (Exception e) {
-    		System.out.println("Exception while accesing URL");
+    		logger.log("debug", "error", "Exception while accesing URL");
     	    return null;
     	}
 	}
 	
-	public static JSONObject GETComplex(String url, String json, int timeout, String method, String referer){
+	public static JSONObject GETComplex(String url, String json, int timeout, String method, String referer, Logger logger){
 		HttpURLConnection connection = null;
 		try {
 	        URL u = new URL(url);
@@ -70,7 +70,7 @@ public class JSONTools {
 	        connection.connect();
 	 
 	        int status = connection.getResponseCode();
-	        e("HTTP Client", "HTTP status code : " + status);
+	        e("HTTP Client", "HTTP status code : " + status, logger);
 	        switch (status) {
 	            case 200:
 	            case 201:
@@ -81,25 +81,25 @@ public class JSONTools {
 	                    sb.append(line + "\n");
 	                }
 	                bufferedReader.close();
-	                e("HTTP Client", "Received String : " + sb.toString());
+	                e("HTTP Client", "Received String : " + sb.toString(), logger);
 	                return new JSONObject(sb.toString());             
 	        }
 	 
 	    } catch (MalformedURLException ex) {
 	    	ex.printStackTrace();
-	        e("HTTP Client", "Error in http connection" + ex.toString());
+	        e("HTTP Client", "Error in http connection" + ex.toString(), logger);
 	    } catch (IOException ex) {
 	    	ex.printStackTrace();
-	        e("HTTP Client", "Error in http connection" + ex.toString());
+	        e("HTTP Client", "Error in http connection" + ex.toString(), logger);
 	    } catch (Exception ex) {
 	    	ex.printStackTrace();
-	        e("HTTP Client", "Error in http connection" + ex.toString());
+	        e("HTTP Client", "Error in http connection" + ex.toString(), logger);
 	    } finally {
 	        if (connection != null) {
 	            try {
 	                connection.disconnect();
 	            } catch (Exception ex) {
-	                e("HTTP Client", "Error in http connection" + ex.toString());
+	                e("HTTP Client", "Error in http connection" + ex.toString(), logger);
 	            }
 	        }
 	    }
@@ -109,8 +109,8 @@ public class JSONTools {
 	
 	
 	
-	public static void e(String A, String B){
-		//System.out.println(A + B);
+	public static void e(String A, String B, Logger logger){
+		logger.log("debug", "info", A + " - " + B);
 	}
 	
 	

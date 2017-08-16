@@ -9,97 +9,93 @@ import java.net.URL;
 
 public class Downloader {
 	
-	public static boolean downloadFile(String fileURL, String saveDir, String fileName) throws IOException{
-		int BUFFER_SIZE = 4096;
-		int contentLength = -1;
+	public static String downloadFile(String fileURL, String saveDir, String fileName, Logger logger) throws IOException{
+		int BUFFER_SIZE = 8192;
 		URL url = new URL(fileURL);
-		HttpURLConnection httpConn = (HttpURLConnection) url.openConnection();
-		int responseCode = httpConn.getResponseCode();
-
+		HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+		int responseCode = connection.getResponseCode();
 		
-		// always check HTTP response code first
+		//Check response code
 		if (responseCode == HttpURLConnection.HTTP_OK) {
-			String disposition = httpConn.getHeaderField("Content-Disposition");
-			String contentType = httpConn.getContentType();
-			contentLength = httpConn.getContentLength();
-			
+			String disposition = connection.getHeaderField("Content-Disposition");
+			String contentType = connection.getHeaderField("Content-Type");
+			String saveFilePath = "";
 
-			
-			
+			//Check disposition
 			if(disposition == null){
-				httpConn.disconnect();
-				return false;
-			}
-
-			else if (disposition != null && !isFilenameValid(fileName) && fileName != "") {
-					// extracts file name from header field
+				connection.disconnect();
+				return "failed";
+			}	
+			
+			//Extract filename from disposition	if it is not provided
+			if(fileName.equals("")){
 				int index = disposition.indexOf("filename=");
 				if (index > 0) {
 					fileName = disposition.substring(index + 10, disposition.length() - 1);
 				}
 			}
 			
+			//Validate filename
+			fileName = validateFilename(fileName);
 			
-			int index = disposition.indexOf("filename=");
-			if (index > 0) {
-				fileName = disposition.substring(index + 10, disposition.length() - 1);
-			}
+			//Assemble save path from directory and filename
+			saveFilePath = saveDir + File.separator + fileName;
 			
 			/*
+			String contentType = httpConn.getContentType();
+			
 			System.out.println("####################################################################");
 			System.out.println("Download URL = " + fileURL);
 			System.out.println("Content-Type = " + contentType);
-			System.out.println("Content-Disposition = " + disposition);
-			System.out.println("Content-Length = " + contentLength);
 			System.out.println("fileName = " + fileName);
 			System.out.println("####################################################################");
-			*/
 
-			/*
-			System.out.print("####################################################################\n"
+			*/
+			
+			logger.log("debug", "info", "####################################################################\n"
 			+ "Download URL = " + fileURL + "\n"
 			+ "Content-Type = " + contentType + "\n"
-			+ "Content-Disposition = " + disposition + "\n"
-			+ "Content-Length = " + contentLength + "\n"
-			+ "fileName = " + fileName + "\n"
+			+ "Filename = " + fileName + "\n"
+			+ "Directory = " + saveDir + "\n"
+			+ "Full path = " + saveFilePath + "\n"
 			+ "####################################################################\n");
 
-			 */
+			//Sets input from the HTTP connection
+			InputStream inputStream = connection.getInputStream();
 
-			// opens input stream from the HTTP connection
-			InputStream inputStream = httpConn.getInputStream();
-			String saveFilePath = saveDir + File.separator + fileName.replace("\"", "").replace("/","").replace("\\","");
-
+			//Sets output to the specified file
 			FileOutputStream outputStream = new FileOutputStream(saveFilePath); 
 
+			//Read input in chunks and write to output
 			int bytesRead = -1;
 			byte[] buffer = new byte[BUFFER_SIZE];
 			while ((bytesRead = inputStream.read(buffer)) != -1) {
 				outputStream.write(buffer, 0, bytesRead);
 			}
+			
+			//Close both input/output streams and kill the connection
 			outputStream.close();
 			inputStream.close();
-			if(contentLength == -1){
-				httpConn.disconnect();
-				return false;
-			}
-			else{
-				httpConn.disconnect();
-				return true;
-			}
-		} else {
-			System.out.println("No file to download. Server replied HTTP code: " + responseCode);
-			httpConn.disconnect();
-			return false;
+			connection.disconnect();
+			
+			return saveFilePath;
+		} 
+		else {
+			logger.log("debug", "error", "FAILED: Server replied HTTP code: " + responseCode);
+			
+			//Kill the connection
+			connection.disconnect();
+			return "failed";
 		}
 	}
 
-	public static boolean isFilenameValid(String file) {
-		File f = new File(file);
-		try {
-			return f.getCanonicalFile().getName().equals(file);
-		} catch (IOException e) {
-			return false;
+	public static String validateFilename(String file) {
+		String[] ILLEGAL_CHARACTERS = { "/", "\n", "\r", "\t", "\0", "\f", "`", "?", "*", "\\", "<", ">", "|", "\"", ":" };
+		
+		for(int i=0; i<ILLEGAL_CHARACTERS.length; i++){
+			file = file.replace(ILLEGAL_CHARACTERS[i], "");
 		}
+		
+		return file;
 	}
 }

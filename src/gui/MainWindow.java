@@ -4,12 +4,12 @@ import java.awt.EventQueue;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 import java.io.PrintStream;
 
 import javax.swing.JFrame;
 import javax.swing.JTextField;
-
-
+import javax.swing.JTextPane;
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
@@ -17,13 +17,16 @@ import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.text.DefaultCaret;
 
-import logic.CustomOutputStream;
+import logic.CustomErrorOutputStream;
+import logic.CustomInfoOutputStream;
+import logic.Logger;
 import logic.Logic;
 
 import java.awt.Color;
 import javax.swing.border.LineBorder;
 import javax.swing.UIManager;
 import javax.swing.JToolBar;
+import javax.swing.JCheckBox;
 
 public class MainWindow implements ActionListener {
 
@@ -34,13 +37,17 @@ public class MainWindow implements ActionListener {
 	JButton btnAudio;
 	JButton btnVideo;
 	JTextArea textPanel;
+	
+	JCheckBox debugCheck;
+	
+	Logger logger;
 
 	PrintStream standardOut = System.out;
 	PrintStream standardErr = System.err;
 	
 	String mode = "audio";
 
-	private JTextArea textArea;
+	private JTextPane textArea;
 	private JButton buttonClear;
 	
 
@@ -79,6 +86,8 @@ public class MainWindow implements ActionListener {
 	 * Initialize the contents of the frame.
 	 */
 	private void initialize() {
+		
+		logger = new Logger();
 
 		frmEzmusic = new JFrame();
 		frmEzmusic.setResizable(false);
@@ -118,7 +127,7 @@ public class MainWindow implements ActionListener {
 		buttonSelect.setActionCommand("select");
 		frmEzmusic.getContentPane().add(buttonSelect);
 
-		textArea = new JTextArea();
+		textArea = new JTextPane();
 		textArea.setEditable(false);
 		textArea.setBorder(new LineBorder(new Color(0, 0, 0)));
 		textArea.setBounds(10, 165, 579, 287);
@@ -134,8 +143,8 @@ public class MainWindow implements ActionListener {
 
 		frmEzmusic.getContentPane().add(scrollPane);
 
-		System.setOut(new PrintStream(new CustomOutputStream(textArea)));
-		System.setErr(new PrintStream(new CustomOutputStream(textArea)));
+		System.setOut(new PrintStream(new CustomInfoOutputStream(textArea)));
+		System.setErr(new PrintStream(new CustomErrorOutputStream(textArea)));
 		
 		JToolBar toolBar = new JToolBar();
 		toolBar.setBackground(Color.LIGHT_GRAY);
@@ -158,11 +167,20 @@ public class MainWindow implements ActionListener {
 		buttonClear.setActionCommand("clear");
 		buttonClear.setBounds(228, 450, 122, 23);
 		frmEzmusic.getContentPane().add(buttonClear);
+		
+		debugCheck = new JCheckBox("Debug");
+		debugCheck.setBounds(419, 450, 97, 23);
+		debugCheck.addActionListener(this);
+		debugCheck.setActionCommand("debug");
+		frmEzmusic.getContentPane().add(debugCheck);
 
 	}
 
 	@Override
 	public void actionPerformed(ActionEvent arg0) {
+		if("debug".equals(arg0.getActionCommand())){
+			logger.setDebug(debugCheck.isSelected());
+		}
 		if("clear".equals(arg0.getActionCommand())){
 			textArea.setText(""); 
 		}
@@ -184,14 +202,17 @@ public class MainWindow implements ActionListener {
 			savePath = "D:/Escritorio/Prueba";
 			requestedURL = textLink.getText();
 			savePath = textPath.getText();
-	    	if(checkFields(requestedURL, savePath)){
+	    	if(checkFields(requestedURL, savePath)){				
+				new File(textPath.getText() + "\\temp").mkdirs();    		
+		        
+		        
 				buttonDownload.setEnabled(false);
 				textLink.setEnabled(false);
 				textPath.setEnabled(false);
 				
 				System.out.println("Starting download, hold tight!");
 				
-				Runnable logic = new Logic(requestedURL, savePath, mode, this);
+				Runnable logic = new Logic(requestedURL, savePath, mode, this, logger);
 				Thread t = new Thread(logic);
 				t.start();
 				
@@ -217,6 +238,7 @@ public class MainWindow implements ActionListener {
 	        else {
 	        	System.out.println("No Selection");
 	        }
+	        
 	    }	
 	}
 	
@@ -237,5 +259,14 @@ public class MainWindow implements ActionListener {
 		textLink.setEnabled(true);
 		textPath.setEnabled(true);
 		System.out.println("Proccess finished");
+		
+		File file = new File(textPath.getText() + "\\temp");
+	    File[] contents = file.listFiles();
+	    if (contents != null) {
+	        for (File f : contents) {
+	        	f.delete();
+	        }
+	    }
+	    file.delete();
 	}
 }

@@ -10,7 +10,7 @@ public class YouTubeAPI {
 	public final static String BASE_URL = "https://www.googleapis.com/youtube/v3/";
 	public final static String DEVELOPER_KEY = "AIzaSyB-0w6c7lz4DNWcS4blcHFrb3xl_AkGsvk";
 
-	public static ArrayList<String> getLinks(String playListLink) throws JSONException{
+	public static ArrayList<String> getLinks(String playListLink, Logger logger) throws JSONException{
 		ArrayList<String> videoLinks = new ArrayList<String>();
 		String playListCode = "";
 		JSONObject data;
@@ -24,14 +24,14 @@ public class YouTubeAPI {
 		
 		String pageToken = "";
 		String callUrl = BASE_URL + "playlistItems?key=" + DEVELOPER_KEY + "&part=snippet&playlistId=" + playListCode + "&pageToken=" + pageToken;
-		data = JSONTools.GET(callUrl);
+		data = JSONTools.GET(callUrl, logger);
 		
 		int vid_num = (int) data.getJSONObject("pageInfo").get("totalResults");
 		int counter = 0;
 		
 		while(counter < vid_num){
 			callUrl = BASE_URL + "playlistItems?key=" + DEVELOPER_KEY + "&part=snippet&playlistId=" + playListCode + "&pageToken=" + pageToken;
-			data = JSONTools.GET(callUrl);
+			data = JSONTools.GET(callUrl, logger);
 			
 			JSONArray videos = data.getJSONArray("items");
 			

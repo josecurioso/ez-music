@@ -13,12 +13,14 @@ public class Logic implements Runnable{
 	String requestURL;
 	String requestPATH;
 	String mode;
+	Logger logger;
 
-	public Logic(String requestURL, String requestPATH, String mode, MainWindow window){
+	public Logic(String requestURL, String requestPATH, String mode, MainWindow window, Logger logger){
 		this.window = window;
 		this.requestURL = requestURL;
 		this.requestPATH = requestPATH;
 		this.mode = mode;
+		this.logger = logger;
 		
 	}
 	
@@ -31,45 +33,34 @@ public class Logic implements Runnable{
 		else if (requestURL.contains("youtube.com") && requestURL.contains("playlist?list=")) {
 			ArrayList<String> videoLinks = null;
 			try{
-				videoLinks = YouTubeAPI.getLinks(requestURL);
+				videoLinks = YouTubeAPI.getLinks(requestURL, logger);
 				for (String link : videoLinks) {
 					download(link, requestPATH);
 				}
-				for (Thread t : this.threads){
-					try{
-						t.join();
-					}
-					catch(InterruptedException e){}
-				}
 			}
 			catch(JSONException e){}
+		}
+		for (Thread t : this.threads){
+			try{
+				t.join();
+			}
+			catch(InterruptedException e){}
 		}
 		
 		window.downloadFinished();
 	}
 	
 	public void download(String videoURL, String requestPATH){
-		if(mode.equals("audio")){
-			try{
-				Runnable r = new DownloaderMP3(videoURL, requestPATH);
-				Thread t = new Thread(r);
-				this.threads.add(t);
-				t.start();
-			}
-			catch(Exception e){
-				e.printStackTrace();
-			}		
+		Runnable r = null;
+		if(mode.equals("audio")){ r = new DownloaderMP3(videoURL, requestPATH, logger); }
+		if(mode.equals("video")){ r = new DownloaderMP4(videoURL, requestPATH, logger); }
+		try{
+			Thread t = new Thread(r);
+			this.threads.add(t);
+			t.start();
 		}
-		if(mode.equals("video")){
-			try{
-				Runnable r = new DownloaderMP4(videoURL, requestPATH);
-				Thread t = new Thread(r);
-				this.threads.add(t);
-				t.start();
-			}
-			catch(Exception e){
-				e.printStackTrace();
-			}		
-		}
+		catch(Exception e){
+			e.printStackTrace();
+		}		
 	}
 }
