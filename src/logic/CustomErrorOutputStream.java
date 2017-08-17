@@ -4,7 +4,6 @@ import java.awt.Color;
 import java.io.IOException;
 import java.io.OutputStream;
  
-import javax.swing.JTextArea;
 import javax.swing.JTextPane;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
@@ -16,15 +15,13 @@ import javax.swing.text.StyledDocument;
  *
  */
 public class CustomErrorOutputStream extends OutputStream {
-    private JTextPane textArea;
 
 	SimpleAttributeSet keyWord;
 	StyledDocument doc;
      
-    public CustomErrorOutputStream(JTextPane textArea) {
-        this.textArea = textArea;
+    public CustomErrorOutputStream(JTextPane textPane) {
         keyWord = new SimpleAttributeSet();
-    	doc = textArea.getStyledDocument();
+    	doc = textPane.getStyledDocument();
     	StyleConstants.setForeground(keyWord, Color.RED.darker());
     }
      
@@ -37,6 +34,4 @@ public class CustomErrorOutputStream extends OutputStream {
     	}
     	catch(Exception e) { System.out.println(e); }
     }
-    	
-        //textArea.append(String.valueOf((char)b));
 }
