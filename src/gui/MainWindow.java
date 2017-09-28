@@ -356,6 +356,7 @@ public class MainWindow implements ActionListener {
 	    }	
 	}
 	
+	//needs to go
 	public void updateInfo(){
 		try {
 			JSONObject data = YouTubeAPI.getInfo(textLink.getText(), logger);
