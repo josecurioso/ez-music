@@ -1,4 +1,4 @@
-package logic;
+package except;
 
 public class FailedDownloadException extends Exception {
 

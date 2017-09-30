@@ -7,6 +7,8 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+import logger.Logger;
+
 public class Downloader {
 	
 	public static String downloadFile(String fileURL, String saveDir, String fileName, Logger logger) throws IOException{
@@ -89,7 +91,7 @@ public class Downloader {
 		}
 	}
 
-	public static String validateFilename(String file) {
+	private static String validateFilename(String file) {
 		String[] ILLEGAL_CHARACTERS = { "/", "\n", "\r", "\t", "\0", "\f", "`", "?", "*", "\\", "<", ">", "|", "\"", ":" };
 		
 		for(int i=0; i<ILLEGAL_CHARACTERS.length; i++){

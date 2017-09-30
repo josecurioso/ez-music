@@ -1,4 +1,4 @@
-package logic;
+package tools;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -11,6 +11,8 @@ import java.nio.charset.Charset;
 
 import org.apache.commons.io.IOUtils;
 import org.json.JSONObject;
+
+import logger.Logger;
 
 public class JSONTools {
 	
@@ -107,9 +109,7 @@ public class JSONTools {
 	}
 	
 	
-	
-	
-	public static void e(String A, String B, Logger logger){
+	private static void e(String A, String B, Logger logger){
 		logger.log("debug", "info", A + " - " + B);
 	}
 	

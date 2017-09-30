@@ -1,4 +1,4 @@
-package logic;
+package tools;
 
 import java.util.ArrayList;
 
@@ -6,9 +6,11 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class YouTubeAPI {
-	public final static String BASE_URL = "https://www.googleapis.com/youtube/v3/";
-	public final static String DEVELOPER_KEY = "AIzaSyB-0w6c7lz4DNWcS4blcHFrb3xl_AkGsvk";
+import logger.Logger;
+
+public class YouTubeAPITools {
+	private final static String BASE_URL = "https://www.googleapis.com/youtube/v3/";
+	private final static String DEVELOPER_KEY = "AIzaSyB-0w6c7lz4DNWcS4blcHFrb3xl_AkGsvk";
 
 	public static ArrayList<String> getLinks(String playListLink, Logger logger) throws JSONException{
 		ArrayList<String> videoLinks = new ArrayList<String>();
@@ -53,7 +55,7 @@ public class YouTubeAPI {
     	return videoLinks;
     }
 
-	public static JSONObject getInfo(String inUrl, Logger logger) throws JSONException {
+	public static JSONObject getLinkInfo(String inUrl, Logger logger) throws JSONException {
 		JSONObject data = new JSONObject();
 
 		String url = fixUrl(inUrl, logger);
@@ -101,7 +103,7 @@ public class YouTubeAPI {
 	}
 	
 	
-	public static String fixUrl(String inUrl, Logger logger){
+	private static String fixUrl(String inUrl, Logger logger){
 		String url = inUrl;
 		
 		String[] videoOptions = {"https://www.youtube.com/watch?v=", "https://youtube.com/watch?v=", "https://youtu.be/", "http://www.youtube.com/watch?v=", "http://youtube.com/watch?v=", "http://youtu.be/", "www.youtube.com/watch?v=", "youtube.com/watch?v=", "youtu.be/"};

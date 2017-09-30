@@ -1,12 +1,9 @@
-package logic;
+package logger;
 
 public class Logger {
-
-	boolean activate;
-
-	boolean debug;
+	private boolean activate;
+	private boolean debug;
 	
-
 	public Logger(){
 		this.activate = true;
 		this.debug = false;
@@ -23,7 +20,10 @@ public class Logger {
 	
 	
 	public void log(String level, String status, String message){
-		if(activate){
+		if(true){
+			
+		}
+		if(activate){ //else{
 			if(status.equals("info")){
 				if(level.equals("standard") || (level.equals("debug") && debug)){
 					System.out.println(message);

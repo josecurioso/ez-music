@@ -2,11 +2,15 @@ package logic;
 
 import org.json.JSONObject;
 
+import except.FailedDownloadException;
+import logger.Logger;
+import tools.JSONTools;
+
 public class DownloaderMP4 implements Runnable{
 
-	String videoURL;
-	String requestPATH;
-	Logger logger;
+	private String videoURL;
+	private String requestPATH;
+	private Logger logger;
 	
 	
 	public DownloaderMP4(String videoURL, String requestPATH, Logger logger){
@@ -26,7 +30,7 @@ public class DownloaderMP4 implements Runnable{
 	}
 	
 	
-	public void optionA(String videoURL, String requestPATH) throws FailedDownloadException{		
+	private void optionA(String videoURL, String requestPATH) throws FailedDownloadException{		
 		try{
 			JSONObject videoInfo = JSONTools.GETComplex("https://www.ytbmp4.com/i/search", "{\"q\":\"" + videoURL + "\"}", 100000, "POST", "https://www.ytbmp4.com", logger);
 			String id = videoInfo.getJSONArray("items").getJSONObject(0).get("id").toString();

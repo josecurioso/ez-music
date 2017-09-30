@@ -1,4 +1,4 @@
-package logic;
+package tools;
 
 import java.io.File;
 import java.io.IOException;
@@ -12,6 +12,8 @@ import org.jaudiotagger.audio.mp3.MP3File;
 import org.jaudiotagger.tag.FieldKey;
 import org.jaudiotagger.tag.Tag;
 import org.jaudiotagger.tag.TagException;
+
+import logger.Logger;
 
 
 public class ID3Tools {

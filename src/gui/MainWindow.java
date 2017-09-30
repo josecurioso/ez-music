@@ -2,91 +2,67 @@ package gui;
 
 import java.awt.EventQueue;
 import java.awt.Toolkit;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.File;
-import java.io.IOException;
-import java.io.PrintStream;
-import java.net.URL;
 
 import javax.swing.JFrame;
-import javax.swing.JTextField;
-import javax.swing.JTextPane;
+import javax.swing.JPanel;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.TitledBorder;
+
+
+import logger.Logger;
+import logic.LogicMain;
+
+import javax.swing.UIManager;
+import java.awt.Color;
 import javax.swing.JLabel;
+import javax.swing.SwingConstants;
+import javax.swing.ImageIcon;
+import javax.swing.border.LineBorder;
+import javax.swing.JTextField;
 import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
+import javax.swing.JTextPane;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
-import javax.swing.text.DefaultCaret;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import logic.CustomErrorOutputStream;
-import logic.CustomInfoOutputStream;
-import logic.FailedDownloadException;
-import logic.Logger;
-import logic.Logic;
-import logic.YouTubeAPI;
-
-import java.awt.BorderLayout;
-import java.awt.Color;
-import javax.swing.border.LineBorder;
-import javax.swing.event.CaretEvent;
-import javax.swing.event.CaretListener;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
-import javax.swing.UIManager;
-import javax.swing.JToolBar;
-import javax.swing.JCheckBox;
-import java.awt.Font;
-import java.awt.Image;
-
-import javax.swing.JInternalFrame;
-import javax.swing.JSplitPane;
-import java.awt.Component;
-
+import javax.swing.JRadioButton;
 import javax.imageio.ImageIO;
-import javax.swing.Box;
-import javax.swing.ImageIcon;
-import javax.swing.JSeparator;
-import javax.swing.JPanel;
-import javax.swing.border.BevelBorder;
+import javax.swing.ButtonGroup;
+import java.net.URL;
 
-public class MainWindow implements ActionListener {
+public class MainWindow extends JFrame {
 
-	JFrame frmEzmusic;
-	JTextField textLink;
-	JTextField textPath;
-	JButton buttonDownload;
-	JButton btnAudio;
-	JButton btnVideo;
-	JButton buttonClear;
-	JTextArea textPanel;
-	JCheckBox debugCheck;
-	JTextPane textArea;
-	
-	JLabel titleLabel;
-	JLabel channelLabel;
-	JLabel amountLabel;
-	JTextPane textPane;
-	ImageIcon thumbnail;
-	ImageIcon thumbnailPlaceholder;
-	JPanel imagePanel;
-
-	ImageIcon defaultThumb;
-	ImageIcon lastThumb;
-	
-	Logger logger;
-
-	PrintStream standardOut = System.out;
-	PrintStream standardErr = System.err;
-	
-	String mode = "audio";
+	private static final long serialVersionUID = 1L;  //Auto-generated
+	private JPanel contentPane;
+	private JPanel linkPane;
+	private JPanel infoPane;
+	private JPanel downloadPane;
+	private JLabel lblThumbnail;
+	private JTextField textLink;
 	private JLabel lblTitle;
 	private JLabel lblChannel;
-	private JLabel lblAmountifPlaylist;
+	private JLabel lblAmount;
+	private JLabel lblDescription;
+	private JScrollPane descScroll;
+	private JTextPane descPane;
+	private JTextField textTitle;
+	private JTextField textChannel;
+	private JTextField textAmount;
+	private JLabel lblPath;
+	private JLabel lblMode;
+	private JTextField textPath;
+	private JButton btnSelect;
+	private JRadioButton rdbtnAudio;
+	private JRadioButton rdbtnVideo;
+	private JButton btnDownload;
+	private final ButtonGroup buttonGroup = new ButtonGroup();
 	
+	//From here on, my atributes
+	final static ImageIcon DEFAULT_THUMBNAIL = new ImageIcon(MainWindow.class.getResource("/gui/images/mqdefault.jpg"));
+	Logger logger;
+	GuiActionListener guiListener;
+	LogicMain logicMain;
+	TextOutput txtOutput;
+	private JButton btnTextOutput;
+	private JLabel lblInfo;
 
 	/**
 	 * Launch the application.
@@ -103,8 +79,8 @@ public class MainWindow implements ActionListener {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					MainWindow window = new MainWindow();
-					window.frmEzmusic.setVisible(true);
+					MainWindow frame = new MainWindow();
+					frame.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -113,317 +89,313 @@ public class MainWindow implements ActionListener {
 	}
 
 	/**
-	 * Create the application.
+	 * Create the frame.
 	 */
 	public MainWindow() {
-		initialize();
-	}
-
-	/**
-	 * Initialize the contents of the frame.
-	 */
-	private void initialize() {
 		
 		logger = new Logger();
-
-		frmEzmusic = new JFrame();
-		frmEzmusic.setResizable(false);
-		frmEzmusic.setIconImage(Toolkit.getDefaultToolkit().getImage(MainWindow.class.getResource("/gui/256x256.png")));
-		frmEzmusic.setTitle("ez-music");
-		frmEzmusic.setBounds(100, 100, 1053, 520);
-		frmEzmusic.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frmEzmusic.getContentPane().setLayout(null);
-
-		textLink = new JTextField();
-		textLink.setBounds(497, 31, 540, 20);
-		frmEzmusic.getContentPane().add(textLink);
-		textLink.setColumns(10);
-		textLink.getDocument().addDocumentListener(new ChangeListener(this, logger));
-
-		JLabel lblLink = new JLabel("Link:");
-		lblLink.setBounds(447, 34, 31, 14);
-		frmEzmusic.getContentPane().add(lblLink);
-
-		JLabel lblPath = new JLabel("Path:");
-		lblPath.setBounds(447, 65, 31, 14);
-		frmEzmusic.getContentPane().add(lblPath);
-
-		textPath = new JTextField();
-		textPath.setColumns(10);
-		textPath.setBounds(498, 62, 440, 20);
-		frmEzmusic.getContentPane().add(textPath);
-
-		buttonDownload = new JButton("Download");
-		buttonDownload.setBounds(447, 97, 590, 54);
-		buttonDownload.addActionListener(this);
-		buttonDownload.setActionCommand("download");
-		frmEzmusic.getContentPane().add(buttonDownload);
-
-		JButton buttonSelect = new JButton("Select");
-		buttonSelect.setBounds(948, 61, 89, 23);
-		buttonSelect.addActionListener(this);
-		buttonSelect.setActionCommand("select");
-		frmEzmusic.getContentPane().add(buttonSelect);
-
-		textArea = new JTextPane();
-		textArea.setFont(new Font("Tahoma", Font.PLAIN, 13));
-		textArea.setEditable(false);
-		textArea.setBorder(new LineBorder(new Color(0, 0, 0)));
-		textArea.setBounds(10, 165, 579, 287);
-
-		DefaultCaret caret = (DefaultCaret) textArea.getCaret();
-		caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
-
-		JScrollPane scrollPane = new JScrollPane();
-		scrollPane.setSize(590, 288);
-		scrollPane.setLocation(447, 170);
-		scrollPane.add(textArea);
-		scrollPane.setViewportView(textArea);
-
-		frmEzmusic.getContentPane().add(scrollPane);
-
-		System.setOut(new PrintStream(new CustomInfoOutputStream(textArea)));
-		System.setErr(new PrintStream(new CustomErrorOutputStream(textArea)));
+		guiListener = new GuiActionListener(this, txtOutput, logger);
+		logicMain = new LogicMain(this, logger);
+		txtOutput = new TextOutput(logger);
 		
-		JToolBar toolBar = new JToolBar();
-		toolBar.setBackground(Color.WHITE);
-		toolBar.setFloatable(false);
-		toolBar.setBounds(0, 0, 609, 20);
-		frmEzmusic.getContentPane().add(toolBar);
-		
-		btnAudio = new JButton("Audio");
-		btnAudio.setSelected(true);
-		btnAudio.setBorderPainted(false);
-		btnAudio.setFont(new Font("Tahoma", Font.PLAIN, 14));
-		btnAudio.addActionListener(this);
-		btnAudio.setActionCommand("audioSwitch");
-		toolBar.add(btnAudio);
-		
-		btnVideo = new JButton("Video");
-		btnVideo.setFont(new Font("Tahoma", Font.PLAIN, 14));
-		btnVideo.addActionListener(this);
-		btnVideo.setActionCommand("videoSwitch");
-		toolBar.add(btnVideo);
-		
-		buttonClear = new JButton("Clear output");
-		buttonClear.addActionListener(this);
-		buttonClear.setActionCommand("clear");
-		buttonClear.setBounds(638, 465, 122, 23);
-		frmEzmusic.getContentPane().add(buttonClear);
-		
-		debugCheck = new JCheckBox("Debug");
-		debugCheck.setBounds(790, 465, 97, 23);
-		debugCheck.addActionListener(this);
-		debugCheck.setActionCommand("debug");
-		frmEzmusic.getContentPane().add(debugCheck);
-		
-		imagePanel = new JPanel();
-		imagePanel.setBounds(57, 44, 320, 180);
-		frmEzmusic.getContentPane().add(imagePanel);
-		
-		defaultThumb = new ImageIcon(MainWindow.class.getResource("/gui/mqdefault.jpg"));
-		lastThumb = defaultThumb;
-		imagePanel.add(new JLabel("", defaultThumb, JLabel.CENTER));
-		
-		
-		
-		
-		lblTitle = new JLabel("Title: ");
-		lblTitle.setBounds(23, 235, 46, 14);
-		frmEzmusic.getContentPane().add(lblTitle);
-		
-		lblChannel = new JLabel("Channel: ");
-		lblChannel.setBounds(23, 260, 46, 14);
-		frmEzmusic.getContentPane().add(lblChannel);
-		
-		lblAmountifPlaylist = new JLabel("Amount (if playlist): ");
-		lblAmountifPlaylist.setBounds(23, 285, 97, 14);
-		frmEzmusic.getContentPane().add(lblAmountifPlaylist);
-		
-		
-		
-		
-		
-		
-		textPane = new JTextPane();
-		//textPane.setFont(new Font("Tahoma", Font.PLAIN, 13));
-		textPane.setEditable(false);
-		textPane.setBorder(new LineBorder(new Color(0, 0, 0)));
-		textPane.setBounds(23, 325, 401, 133);
-
-		DefaultCaret caret1 = (DefaultCaret) textPane.getCaret();
-		caret1.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
-
-		JScrollPane scrollPane_1 = new JScrollPane();
-		scrollPane_1.setSize(417, 132);
-		scrollPane_1.setLocation(17, 325);
-		scrollPane_1.add(textPane);
-		scrollPane_1.setViewportView(textPane);
-
-		frmEzmusic.getContentPane().add(scrollPane_1);
-		
-		
-		JLabel lblDescription = new JLabel("Description:");
-		lblDescription.setBounds(23, 310, 143, 14);
-		frmEzmusic.getContentPane().add(lblDescription);
-		
-		titleLabel = new JLabel("");
-		titleLabel.setBounds(57, 235, 367, 14);
-		frmEzmusic.getContentPane().add(titleLabel);
-		
-		channelLabel = new JLabel("");
-		channelLabel.setBounds(79, 260, 345, 14);
-		frmEzmusic.getContentPane().add(channelLabel);
-		
-		amountLabel = new JLabel("");
-		amountLabel.setBounds(130, 285, 294, 14);
-		frmEzmusic.getContentPane().add(amountLabel);
-		
-		
-		
-/*
-		MainWindow hola = new MainWindow();
-		hola.frmEzmusic.setVisible(true);
-
-*/
+		setTitle("ez-music");
+		setResizable(false);
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setBounds(100, 100, 737, 698);
+		setIconImage(Toolkit.getDefaultToolkit().getImage(MainWindow.class.getResource("/gui/images/256x256.png")));
+		contentPane = new JPanel();
+		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
+		setContentPane(contentPane);
+		contentPane.setLayout(null);
+		contentPane.add(getLinkPane());
+		contentPane.add(getInfoPane());
+		contentPane.add(getDownloadPane());
+		contentPane.add(getBtnTextOutput());
+		contentPane.add(getLblInfo());
 	}
-
-	@Override
-	public void actionPerformed(ActionEvent arg0) {
-		if("debug".equals(arg0.getActionCommand())){
-			logger.setDebug(debugCheck.isSelected());
+	private JPanel getLinkPane() {
+		if (linkPane == null) {
+			linkPane = new JPanel();
+			linkPane.setBorder(new TitledBorder(null, "1 - Link", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+			linkPane.setBounds(10, 11, 710, 81);
+			linkPane.setLayout(null);
+			linkPane.add(getTextLink());
 		}
-		if("clear".equals(arg0.getActionCommand())){
-			textArea.setText(""); 
-		}
-		if("audioSwitch".equals(arg0.getActionCommand())){
-			mode = "audio";
-			textArea.setText(""); 
-			logger.log("standard", "info", "Now in " + mode + " mode");
-			//lblMode.setText("Audio");
-		}
-		if("videoSwitch".equals(arg0.getActionCommand())){
-			mode = "video";
-			textArea.setText(""); 
-			logger.log("standard", "info", "Now in " + mode + " mode");
-			//lblMode.setText("Video");
-		}
-	    if ("download".equals(arg0.getActionCommand())) {
-	    	String requestedURL;
-			String savePath;
-			
-			requestedURL = "https://www.youtube.com/playlist?list=PL9fZWvwimefsU-MruxuoWATNhP-wkF825";
-			savePath = "D:/Escritorio/Prueba";
-			requestedURL = textLink.getText();
-			savePath = textPath.getText();
-	    	if(checkFields(requestedURL, savePath)){				
-				new File(textPath.getText() + "\\temp").mkdirs();    		
-		        
-		        
-				buttonDownload.setEnabled(false);
-				textLink.setEnabled(false);
-				textPath.setEnabled(false);
-				
-				logger.log("standard", "info", "Starting download, hold tight!");
-				
-				Runnable logic = new Logic(requestedURL, savePath, mode, this, logger);
-				Thread t = new Thread(logic);
-				t.start();
-				
-				
-	    	}
-	    	else{
-	    		logger.log("standard", "error", "Error in one of the fields");
-	    		buttonDownload.setEnabled(true);
-				textLink.setEnabled(true);
-				textPath.setEnabled(true);
-	    	}
-	    } 
-	    else if("select".equals(arg0.getActionCommand())){
-	    	JFileChooser chooser = new JFileChooser();
-	        chooser.setCurrentDirectory(new java.io.File("."));
-	        chooser.setDialogTitle("Choose a directory");
-	        chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-	        chooser.setAcceptAllFileFilterUsed(false);
-
-	        if (chooser.showOpenDialog(frmEzmusic) == JFileChooser.APPROVE_OPTION) {
-	        	textPath.setText(chooser.getSelectedFile().getAbsolutePath());
-	        } 
-	        else {
-	        	System.out.println("No Selection");
-	        }
-	        
-	    }	
+		return linkPane;
 	}
-	
-	//needs to go
-	public void updateInfo(){
-		try {
-			JSONObject data = YouTubeAPI.getInfo(textLink.getText(), logger);
-			if(data != null){
-				logger.log("debug", "info", data.getString("title"));
-				logger.log("debug", "info", data.getString("channel"));
-				logger.log("debug", "info", new Integer(data.getInt("qt")).toString());
-				logger.log("debug", "info", data.getString("description"));
-				
-				titleLabel.setText(data.getString("title"));				
-				channelLabel.setText(data.getString("channel"));
-				if(data.getInt("qt") != -1) amountLabel.setText(new Integer(data.getInt("qt")).toString());
-				else amountLabel.setText("");
-				textPane.setText(data.getString("description"));
-				
-				Image image = ImageIO.read(new URL(data.getString("thumb")));
-			    thumbnail = new ImageIcon(image);
-				if(!lastThumb.equals(thumbnail)){
-					imagePanel.removeAll();
-					imagePanel.add(new JLabel("", thumbnail, JLabel.CENTER));
-					lastThumb = thumbnail;
-				}
-				imagePanel.repaint();
-			}
-			else if(data == null){
-				throw new RuntimeException();
-			}
+	private JPanel getInfoPane() {
+		if (infoPane == null) {
+			infoPane = new JPanel();
+			infoPane.setLayout(null);
+			infoPane.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "2 - Info", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)));
+			infoPane.setBounds(10, 103, 710, 405);
+			infoPane.add(getLblThumbnail());
+			infoPane.add(getLblTitle());
+			infoPane.add(getLblChannel());
+			infoPane.add(getLblAmount());
+			infoPane.add(getLblDescription());
+			infoPane.add(getDescScroll());
+			infoPane.add(getTextTitle());
+			infoPane.add(getTextChannel());
+			infoPane.add(getTextAmount());
 		}
-		catch (Exception e) {
-			titleLabel.setText("");				
-			channelLabel.setText("");
-			amountLabel.setText("");
-			textPane.setText("");
-			if(!lastThumb.equals(defaultThumb)){
-				imagePanel.removeAll();
-				imagePanel.add(new JLabel("", defaultThumb, JLabel.CENTER));
-				lastThumb = defaultThumb;
-			}
-			imagePanel.repaint();
+		return infoPane;
+	}
+	private JPanel getDownloadPane() {
+		if (downloadPane == null) {
+			downloadPane = new JPanel();
+			downloadPane.setLayout(null);
+			downloadPane.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "3 - Download", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)));
+			downloadPane.setBounds(10, 520, 710, 107);
+			downloadPane.add(getLblPath());
+			downloadPane.add(getLblMode());
+			downloadPane.add(getTextPath());
+			downloadPane.add(getBtnSelect());
+			downloadPane.add(getRdbtnAudio());
+			downloadPane.add(getRdbtnVideo());
+			downloadPane.add(getBtnDownload());
 		}
+		return downloadPane;
+	}
+	private JLabel getLblThumbnail() {
+		if (lblThumbnail == null) {
+			lblThumbnail = new JLabel("", DEFAULT_THUMBNAIL, SwingConstants.CENTER);
+			lblThumbnail.setBorder(new LineBorder(new Color(0, 0, 0), 2));
+			lblThumbnail.setBounds(21, 24, 320, 180);
+		}
+		return lblThumbnail;
+	}
+	private JTextField getTextLink() {
+		if (textLink == null) {
+			textLink = new JTextField();
+			textLink.setBounds(21, 29, 660, 20);
+			textLink.setColumns(10);
+			textLink.getDocument().addDocumentListener(new ChangeListener(this, logger));
+		}
+		return textLink;
+	}
+	private JLabel getLblTitle() {
+		if (lblTitle == null) {
+			lblTitle = new JLabel("Title:");
+			lblTitle.setLabelFor(getTextTitle());
+			lblTitle.setBounds(351, 64, 46, 14);
+		}
+		return lblTitle;
+	}
+	private JLabel getLblChannel() {
+		if (lblChannel == null) {
+			lblChannel = new JLabel("Channel:");
+			lblChannel.setLabelFor(getTextChannel());
+			lblChannel.setBounds(351, 102, 68, 14);
+		}
+		return lblChannel;
+	}
+	private JLabel getLblAmount() {
+		if (lblAmount == null) {
+			lblAmount = new JLabel("Amount:");
+			lblAmount.setLabelFor(getTextAmount());
+			lblAmount.setBounds(351, 138, 68, 14);
+		}
+		return lblAmount;
+	}
+	private JLabel getLblDescription() {
+		if (lblDescription == null) {
+			lblDescription = new JLabel("Description:");
+			lblDescription.setLabelFor(getDescPane());
+			lblDescription.setBounds(351, 190, 68, 14);
+		}
+		return lblDescription;
+	}
+	private JScrollPane getDescScroll() {
+		if (descScroll == null) {
+			descScroll = new JScrollPane();
+			descScroll.setBounds(21, 215, 668, 166);
+			descScroll.setViewportView(getDescPane());
+		}
+		return descScroll;
+	}
+	private JTextPane getDescPane() {
+		if (descPane == null) {
+			descPane = new JTextPane();
+			descPane.setEditable(false);
+		}
+		return descPane;
+	}
+	private JTextField getTextTitle() {
+		if (textTitle == null) {
+			textTitle = new JTextField();
+			textTitle.setEditable(false);
+			textTitle.setBounds(382, 61, 306, 20);
+			textTitle.setColumns(10);
+		}
+		return textTitle;
+	}
+	private JTextField getTextChannel() {
+		if (textChannel == null) {
+			textChannel = new JTextField();
+			textChannel.setEditable(false);
+			textChannel.setBounds(404, 99, 284, 20);
+			textChannel.setColumns(10);
+		}
+		return textChannel;
+	}
+	private JTextField getTextAmount() {
+		if (textAmount == null) {
+			textAmount = new JTextField();
+			textAmount.setEditable(false);
+			textAmount.setBounds(401, 135, 55, 20);
+			textAmount.setColumns(10);
+		}
+		return textAmount;
+	}
+	private JLabel getLblPath() {
+		if (lblPath == null) {
+			lblPath = new JLabel("Path:");
+			lblPath.setLabelFor(getTextPath());
+			lblPath.setBounds(20, 29, 46, 14);
+		}
+		return lblPath;
+	}
+	private JLabel getLblMode() {
+		if (lblMode == null) {
+			lblMode = new JLabel("Mode:");
+			lblMode.setBounds(20, 66, 46, 14);
+		}
+		return lblMode;
+	}
+	private JTextField getTextPath() {
+		if (textPath == null) {
+			textPath = new JTextField();
+			textPath.setBounds(62, 26, 526, 20);
+			textPath.setColumns(10);
+		}
+		return textPath;
+	}
+	private JButton getBtnSelect() {
+		if (btnSelect == null) {
+			btnSelect = new JButton("Select");
+			btnSelect.addActionListener(guiListener);
+			btnSelect.setActionCommand("select");
+			btnSelect.setBounds(598, 25, 89, 23);
+		}
+		return btnSelect;
+	}
+	private JRadioButton getRdbtnAudio() {
+		if (rdbtnAudio == null) {
+			rdbtnAudio = new JRadioButton("Audio");
+			rdbtnAudio.setSelected(true);
+			buttonGroup.add(rdbtnAudio);
+			rdbtnAudio.addActionListener(guiListener);
+			rdbtnAudio.setActionCommand("audioSwitch");
+			rdbtnAudio.setBounds(62, 62, 58, 23);
+		}
+		return rdbtnAudio;
+	}
+	private JRadioButton getRdbtnVideo() {
+		if (rdbtnVideo == null) {
+			rdbtnVideo = new JRadioButton("Video");
+			buttonGroup.add(rdbtnVideo);
+			rdbtnVideo.addActionListener(guiListener);
+			rdbtnVideo.setActionCommand("videoSwitch");
+			rdbtnVideo.setBounds(122, 62, 58, 23);
+		}
+		return rdbtnVideo;
+	}
+	private JButton getBtnDownload() {
+		if (btnDownload == null) {
+			btnDownload = new JButton("Download");
+			btnDownload.addActionListener(guiListener);
+			btnDownload.setActionCommand("download");
+			btnDownload.setBounds(211, 62, 476, 23);
+		}
+		return btnDownload;
+	}
+	private JButton getBtnTextOutput() {
+		if (btnTextOutput == null) {
+			btnTextOutput = new JButton("Show text output");
+			btnTextOutput.setBounds(300, 636, 116, 22);
+			btnTextOutput.setFocusPainted(false);
+			btnTextOutput.setBorderPainted(false);
+			btnTextOutput.addActionListener(guiListener);
+			btnTextOutput.setActionCommand("textOutput");
+		}
+		return btnTextOutput;
+	}
+	private JLabel getLblInfo() {
+		if (lblInfo == null) {
+			lblInfo = new JLabel("inactive");
+			lblInfo.setBounds(568, 655, 152, 14);
+		}
+		return lblInfo;
 	}
 	
-	public boolean checkFields(String link, String path){
-		boolean clink = false;
-        boolean cpath = false;
-        if (link.contains("http://www.youtube.com/playlist?list=") || link.contains("https://www.youtube.com/playlist?list=") || link.contains("http://www.youtube.com/watch?v=") || link.contains("https://www.youtube.com/watch?v=")){
-        	clink = true;
-        }
-        if (path != ""){
-        	cpath = true;
-        }
-        return(cpath && clink);
+	
+	/*
+	 * From here on, my own methods
+	 */
+	
+	public void updateInfoPane(String[] info){
+		textTitle.setText(info[0]);
+		textChannel.setText(info[1]);
+		textAmount.setText(info[2]);
+		descPane.setText(info[3]);
+		
+		if(info[4].equals("")){
+			lblThumbnail.setIcon(DEFAULT_THUMBNAIL);
+		}
+		else{
+			try {
+				lblThumbnail.setIcon(new ImageIcon(ImageIO.read(new URL(info[4]))));
+			} catch (Exception e) {
+				
+			}
+		}
+		lblThumbnail.repaint();
+	}
+	
+	public void downloadStarted(){
+		btnDownload.setEnabled(false);
+		textLink.setEnabled(false);
+		textPath.setEnabled(false);
+		lblInfo.setText("Download en course");
 	}
 	
 	public void downloadFinished(){
-		buttonDownload.setEnabled(true);
+		btnDownload.setEnabled(true);
 		textLink.setEnabled(true);
 		textPath.setEnabled(true);
-		logger.log("standard", "info", "Proccess finished");
+		lblInfo.setText("Download finished, inactive");
+	}
+	
+	public String[] getCurrentRequest(){
+		String mode = "audio";
+		if(rdbtnAudio.isSelected()) mode = "audio";
+		if(rdbtnVideo.isSelected()) mode = "video";
 		
-		File file = new File(textPath.getText() + "\\temp");
-	    File[] contents = file.listFiles();
-	    if (contents != null) {
-	        for (File f : contents) {
-	        	f.delete();
-	        }
-	    }
-	    file.delete();
+		String[] request = {textLink.getText(), textPath.getText(), mode};
+		return request;
+	}
+	
+	public LogicMain getLogicMain(){
+		return this.logicMain;
+	}
+
+	public void openFileChooser(){
+		JFileChooser chooserWindow = new JFileChooser();
+		chooserWindow.setCurrentDirectory(null);
+        chooserWindow.setDialogTitle("Choose a directory");
+        chooserWindow.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        chooserWindow.setAcceptAllFileFilterUsed(false);
+
+        if (chooserWindow.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
+        	textPath.setText(chooserWindow.getSelectedFile().getAbsolutePath());
+        } 
+        else {
+        	System.out.println("No Selection");
+        }
+	}
+	
+	public void showTextOutput(){
+		txtOutput.setVisible(true);
 	}
 }

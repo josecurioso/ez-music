@@ -4,11 +4,16 @@ import java.io.File;
 
 import org.json.JSONObject;
 
+import except.FailedDownloadException;
+import logger.Logger;
+import tools.ID3Tools;
+import tools.JSONTools;
+
 public class DownloaderMP3 implements Runnable{
 
-	String videoURL;
-	String requestPATH;
-	Logger logger;
+	private String videoURL;
+	private String requestPATH;
+	private Logger logger;
 	
 	
 	public DownloaderMP3(String videoURL, String requestPATH, Logger logger){
@@ -33,7 +38,7 @@ public class DownloaderMP3 implements Runnable{
 		}
 	}
 	
-	public void optionA(String videoURL, String requestPATH) throws FailedDownloadException{
+	private void optionA(String videoURL, String requestPATH) throws FailedDownloadException{
 		try{
 			
 			//First part
@@ -78,7 +83,7 @@ public class DownloaderMP3 implements Runnable{
 		logger.log("standard", "info", "File downloaded on first try");
 	}
 	
-	public void optionB(String videoURL, String requestPATH) throws FailedDownloadException{
+	private void optionB(String videoURL, String requestPATH) throws FailedDownloadException{
 		try{
 			JSONObject data = JSONTools.GET("http://www.youtubeinmp3.com/fetch/?format=JSON&video=" + videoURL, logger);
 			String fileName = "";

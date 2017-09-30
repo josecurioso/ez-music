@@ -1,4 +1,4 @@
-package logic;
+package logger;
  
 import java.awt.Color;
 import java.io.IOException;
@@ -16,8 +16,8 @@ import javax.swing.text.StyledDocument;
  */
 public class CustomInfoOutputStream extends OutputStream {
 
-	SimpleAttributeSet keyWord;
-	StyledDocument doc;
+	private SimpleAttributeSet keyWord;
+	private StyledDocument doc;
      
     public CustomInfoOutputStream(JTextPane textPane) {
         keyWord = new SimpleAttributeSet();
