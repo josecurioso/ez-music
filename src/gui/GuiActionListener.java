@@ -34,6 +34,10 @@ public class GuiActionListener implements ActionListener {
 		if("textOutput".equals(e.getActionCommand())){
 			main.showTextOutput();
 		}
+		if("cbLanguage".equals(e.getActionCommand())){
+			logger.log("standard", "info", "Language switched");
+			main.changeLocale();
+		}
 	}
 
 }

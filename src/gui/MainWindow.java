@@ -1,7 +1,9 @@
 package gui;
 
-import java.awt.EventQueue;
 import java.awt.Toolkit;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.UnsupportedFlavorException;
+import java.io.IOException;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -14,6 +16,8 @@ import logic.LogicMain;
 
 import javax.swing.UIManager;
 import java.awt.Color;
+import java.awt.HeadlessException;
+
 import javax.swing.JLabel;
 import javax.swing.SwingConstants;
 import javax.swing.ImageIcon;
@@ -27,6 +31,7 @@ import javax.swing.JRadioButton;
 import javax.imageio.ImageIO;
 import javax.swing.ButtonGroup;
 import java.net.URL;
+import javax.swing.JComboBox;
 
 public class MainWindow extends JFrame {
 
@@ -53,6 +58,9 @@ public class MainWindow extends JFrame {
 	private JRadioButton rdbtnAudio;
 	private JRadioButton rdbtnVideo;
 	private JButton btnDownload;
+	private JButton btnTextOutput;
+	private JLabel lblInfo;
+	private JComboBox<String> comboBox;
 	private final ButtonGroup buttonGroup = new ButtonGroup();
 	
 	//From here on, my atributes
@@ -61,8 +69,7 @@ public class MainWindow extends JFrame {
 	GuiActionListener guiListener;
 	LogicMain logicMain;
 	TextOutput txtOutput;
-	private JButton btnTextOutput;
-	private JLabel lblInfo;
+	Messages messages;
 
 	/**
 	 * Launch the application.
@@ -76,6 +83,9 @@ public class MainWindow extends JFrame {
 	    catch (Exception e) {
 	       // handle exception
 	    }
+		MainWindow frame = new MainWindow();
+		frame.setVisible(true);
+		/*
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
@@ -86,13 +96,14 @@ public class MainWindow extends JFrame {
 				}
 			}
 		});
+		*/
 	}
 
 	/**
 	 * Create the frame.
 	 */
 	public MainWindow() {
-		
+		messages = new Messages();
 		logger = new Logger();
 		guiListener = new GuiActionListener(this, txtOutput, logger);
 		logicMain = new LogicMain(this, logger);
@@ -112,11 +123,12 @@ public class MainWindow extends JFrame {
 		contentPane.add(getDownloadPane());
 		contentPane.add(getBtnTextOutput());
 		contentPane.add(getLblInfo());
+		contentPane.add(getComboBox());
 	}
 	private JPanel getLinkPane() {
 		if (linkPane == null) {
 			linkPane = new JPanel();
-			linkPane.setBorder(new TitledBorder(null, "1 - Link", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+			linkPane.setBorder(new TitledBorder(null, messages.getString("MainWindow.4"), TitledBorder.LEADING, TitledBorder.TOP, null, null)); //$NON-NLS-1$
 			linkPane.setBounds(10, 11, 710, 81);
 			linkPane.setLayout(null);
 			linkPane.add(getTextLink());
@@ -127,7 +139,7 @@ public class MainWindow extends JFrame {
 		if (infoPane == null) {
 			infoPane = new JPanel();
 			infoPane.setLayout(null);
-			infoPane.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "2 - Info", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)));
+			infoPane.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), messages.getString("MainWindow.6"), TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0))); //$NON-NLS-2$
 			infoPane.setBounds(10, 103, 710, 405);
 			infoPane.add(getLblThumbnail());
 			infoPane.add(getLblTitle());
@@ -145,7 +157,7 @@ public class MainWindow extends JFrame {
 		if (downloadPane == null) {
 			downloadPane = new JPanel();
 			downloadPane.setLayout(null);
-			downloadPane.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "3 - Download", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)));
+			downloadPane.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), messages.getString("MainWindow.8"), TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0))); //$NON-NLS-2$
 			downloadPane.setBounds(10, 520, 710, 107);
 			downloadPane.add(getLblPath());
 			downloadPane.add(getLblMode());
@@ -176,7 +188,7 @@ public class MainWindow extends JFrame {
 	}
 	private JLabel getLblTitle() {
 		if (lblTitle == null) {
-			lblTitle = new JLabel("Title:");
+			lblTitle = new JLabel(messages.getString("MainWindow.10")); //$NON-NLS-1$
 			lblTitle.setLabelFor(getTextTitle());
 			lblTitle.setBounds(351, 64, 46, 14);
 		}
@@ -184,7 +196,7 @@ public class MainWindow extends JFrame {
 	}
 	private JLabel getLblChannel() {
 		if (lblChannel == null) {
-			lblChannel = new JLabel("Channel:");
+			lblChannel = new JLabel(messages.getString("MainWindow.11")); //$NON-NLS-1$
 			lblChannel.setLabelFor(getTextChannel());
 			lblChannel.setBounds(351, 102, 68, 14);
 		}
@@ -192,7 +204,7 @@ public class MainWindow extends JFrame {
 	}
 	private JLabel getLblAmount() {
 		if (lblAmount == null) {
-			lblAmount = new JLabel("Amount:");
+			lblAmount = new JLabel(messages.getString("MainWindow.12")); //$NON-NLS-1$
 			lblAmount.setLabelFor(getTextAmount());
 			lblAmount.setBounds(351, 138, 68, 14);
 		}
@@ -200,7 +212,7 @@ public class MainWindow extends JFrame {
 	}
 	private JLabel getLblDescription() {
 		if (lblDescription == null) {
-			lblDescription = new JLabel("Description:");
+			lblDescription = new JLabel(messages.getString("MainWindow.13")); //$NON-NLS-1$
 			lblDescription.setLabelFor(getDescPane());
 			lblDescription.setBounds(351, 190, 68, 14);
 		}
@@ -250,7 +262,7 @@ public class MainWindow extends JFrame {
 	}
 	private JLabel getLblPath() {
 		if (lblPath == null) {
-			lblPath = new JLabel("Path:");
+			lblPath = new JLabel(messages.getString("MainWindow.14")); //$NON-NLS-1$
 			lblPath.setLabelFor(getTextPath());
 			lblPath.setBounds(20, 29, 46, 14);
 		}
@@ -258,7 +270,7 @@ public class MainWindow extends JFrame {
 	}
 	private JLabel getLblMode() {
 		if (lblMode == null) {
-			lblMode = new JLabel("Mode:");
+			lblMode = new JLabel(messages.getString("MainWindow.15")); //$NON-NLS-1$
 			lblMode.setBounds(20, 66, 46, 14);
 		}
 		return lblMode;
@@ -266,14 +278,14 @@ public class MainWindow extends JFrame {
 	private JTextField getTextPath() {
 		if (textPath == null) {
 			textPath = new JTextField();
-			textPath.setBounds(62, 26, 526, 20);
+			textPath.setBounds(49, 26, 539, 20);
 			textPath.setColumns(10);
 		}
 		return textPath;
 	}
 	private JButton getBtnSelect() {
 		if (btnSelect == null) {
-			btnSelect = new JButton("Select");
+			btnSelect = new JButton(messages.getString("MainWindow.16")); //$NON-NLS-1$
 			btnSelect.addActionListener(guiListener);
 			btnSelect.setActionCommand("select");
 			btnSelect.setBounds(598, 25, 89, 23);
@@ -282,7 +294,7 @@ public class MainWindow extends JFrame {
 	}
 	private JRadioButton getRdbtnAudio() {
 		if (rdbtnAudio == null) {
-			rdbtnAudio = new JRadioButton("Audio");
+			rdbtnAudio = new JRadioButton(messages.getString("MainWindow.18")); //$NON-NLS-1$
 			rdbtnAudio.setSelected(true);
 			buttonGroup.add(rdbtnAudio);
 			rdbtnAudio.addActionListener(guiListener);
@@ -293,7 +305,7 @@ public class MainWindow extends JFrame {
 	}
 	private JRadioButton getRdbtnVideo() {
 		if (rdbtnVideo == null) {
-			rdbtnVideo = new JRadioButton("Video");
+			rdbtnVideo = new JRadioButton(messages.getString("MainWindow.20")); //$NON-NLS-1$
 			buttonGroup.add(rdbtnVideo);
 			rdbtnVideo.addActionListener(guiListener);
 			rdbtnVideo.setActionCommand("videoSwitch");
@@ -303,7 +315,7 @@ public class MainWindow extends JFrame {
 	}
 	private JButton getBtnDownload() {
 		if (btnDownload == null) {
-			btnDownload = new JButton("Download");
+			btnDownload = new JButton(messages.getString("MainWindow.22")); //$NON-NLS-1$
 			btnDownload.addActionListener(guiListener);
 			btnDownload.setActionCommand("download");
 			btnDownload.setBounds(211, 62, 476, 23);
@@ -312,7 +324,7 @@ public class MainWindow extends JFrame {
 	}
 	private JButton getBtnTextOutput() {
 		if (btnTextOutput == null) {
-			btnTextOutput = new JButton("Show text output");
+			btnTextOutput = new JButton(messages.getString("MainWindow.24")); //$NON-NLS-1$
 			btnTextOutput.setBounds(300, 636, 116, 22);
 			btnTextOutput.setFocusPainted(false);
 			btnTextOutput.setBorderPainted(false);
@@ -323,10 +335,20 @@ public class MainWindow extends JFrame {
 	}
 	private JLabel getLblInfo() {
 		if (lblInfo == null) {
-			lblInfo = new JLabel("inactive");
+			lblInfo = new JLabel(messages.getString("MainWindow.26")); //$NON-NLS-1$
 			lblInfo.setBounds(568, 655, 152, 14);
 		}
 		return lblInfo;
+	}
+	private JComboBox<String> getComboBox() {
+		if (comboBox == null) {
+			comboBox = new JComboBox(messages.getLanguages());
+			//comboBox = new JComboBox<String>(messages.getLanguages());
+			comboBox.addActionListener(guiListener);
+			comboBox.setActionCommand("cbLanguage");
+			comboBox.setBounds(10, 638, 74, 20);
+		}
+		return comboBox;
 	}
 	
 	
@@ -357,14 +379,14 @@ public class MainWindow extends JFrame {
 		btnDownload.setEnabled(false);
 		textLink.setEnabled(false);
 		textPath.setEnabled(false);
-		lblInfo.setText("Download en course");
+		lblInfo.setText(messages.getString("MainWindow.28")); //$NON-NLS-1$
 	}
 	
 	public void downloadFinished(){
 		btnDownload.setEnabled(true);
 		textLink.setEnabled(true);
 		textPath.setEnabled(true);
-		lblInfo.setText("Download finished, inactive");
+		lblInfo.setText(messages.getString("MainWindow.29")); //$NON-NLS-1$
 	}
 	
 	public String[] getCurrentRequest(){
@@ -383,7 +405,7 @@ public class MainWindow extends JFrame {
 	public void openFileChooser(){
 		JFileChooser chooserWindow = new JFileChooser();
 		chooserWindow.setCurrentDirectory(null);
-        chooserWindow.setDialogTitle("Choose a directory");
+        chooserWindow.setDialogTitle(messages.getString("MainWindow.33")); //$NON-NLS-1$
         chooserWindow.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
         chooserWindow.setAcceptAllFileFilterUsed(false);
 
@@ -397,5 +419,32 @@ public class MainWindow extends JFrame {
 	
 	public void showTextOutput(){
 		txtOutput.setVisible(true);
+	}
+	
+	public void changeLocale(){
+		messages.switchSource((String) comboBox.getSelectedItem());
+		
+		linkPane.setBorder(new TitledBorder(null, messages.getString("MainWindow.4"), TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		infoPane.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), messages.getString("MainWindow.6"), TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)));
+		downloadPane.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), messages.getString("MainWindow.8"), TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)));
+		lblTitle.setText(messages.getString("MainWindow.10")); //$NON-NLS-1$
+		lblChannel.setText(messages.getString("MainWindow.11")); //$NON-NLS-1$
+		lblAmount.setText(messages.getString("MainWindow.12")); //$NON-NLS-1$
+		lblDescription.setText(messages.getString("MainWindow.13")); //$NON-NLS-1$
+		lblPath.setText(messages.getString("MainWindow.14")); //$NON-NLS-1$
+		lblMode.setText(messages.getString("MainWindow.15")); //$NON-NLS-1$
+		btnSelect.setText(messages.getString("MainWindow.16")); //$NON-NLS-1$
+		rdbtnAudio.setText(messages.getString("MainWindow.18")); //$NON-NLS-1$
+		rdbtnVideo.setText(messages.getString("MainWindow.20")); //$NON-NLS-1$
+		btnDownload.setText(messages.getString("MainWindow.22")); //$NON-NLS-1$
+		btnTextOutput.setText(messages.getString("MainWindow.24")); //$NON-NLS-1$
+		lblInfo.setText(messages.getString("MainWindow.26")); //$NON-NLS-1$
+	}
+	
+	public void pasteAction(){
+		try {
+			textLink.setText((String) Toolkit.getDefaultToolkit().getSystemClipboard().getData(DataFlavor.stringFlavor));
+		} catch (Exception e) {
+		}
 	}
 }
