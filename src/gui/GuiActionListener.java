@@ -38,6 +38,10 @@ public class GuiActionListener implements ActionListener {
 			logger.log("standard", "info", "Language switched");
 			main.changeLocale();
 		}
+		if("paste".equals(e.getActionCommand())){
+			logger.log("standard", "info", "Link pasted");
+			main.pasteAction();
+		}
 	}
 
 }

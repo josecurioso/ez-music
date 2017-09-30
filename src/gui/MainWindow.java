@@ -61,6 +61,7 @@ public class MainWindow extends JFrame {
 	private JButton btnTextOutput;
 	private JLabel lblInfo;
 	private JComboBox<String> comboBox;
+	JButton btnPaste;
 	private final ButtonGroup buttonGroup = new ButtonGroup();
 	
 	//From here on, my atributes
@@ -132,6 +133,7 @@ public class MainWindow extends JFrame {
 			linkPane.setBounds(10, 11, 710, 81);
 			linkPane.setLayout(null);
 			linkPane.add(getTextLink());
+			linkPane.add(getBtnPaste());
 		}
 		return linkPane;
 	}
@@ -180,7 +182,7 @@ public class MainWindow extends JFrame {
 	private JTextField getTextLink() {
 		if (textLink == null) {
 			textLink = new JTextField();
-			textLink.setBounds(21, 29, 660, 20);
+			textLink.setBounds(21, 29, 576, 20);
 			textLink.setColumns(10);
 			textLink.getDocument().addDocumentListener(new ChangeListener(this, logger));
 		}
@@ -299,7 +301,7 @@ public class MainWindow extends JFrame {
 			buttonGroup.add(rdbtnAudio);
 			rdbtnAudio.addActionListener(guiListener);
 			rdbtnAudio.setActionCommand("audioSwitch");
-			rdbtnAudio.setBounds(62, 62, 58, 23);
+			rdbtnAudio.setBounds(59, 62, 67, 23);
 		}
 		return rdbtnAudio;
 	}
@@ -309,7 +311,7 @@ public class MainWindow extends JFrame {
 			buttonGroup.add(rdbtnVideo);
 			rdbtnVideo.addActionListener(guiListener);
 			rdbtnVideo.setActionCommand("videoSwitch");
-			rdbtnVideo.setBounds(122, 62, 58, 23);
+			rdbtnVideo.setBounds(128, 62, 75, 23);
 		}
 		return rdbtnVideo;
 	}
@@ -349,6 +351,15 @@ public class MainWindow extends JFrame {
 			comboBox.setBounds(10, 638, 74, 20);
 		}
 		return comboBox;
+	}
+	private JButton getBtnPaste() {
+		if (btnPaste == null) {
+			btnPaste = new JButton(messages.getString("MainWindow.34"));
+			btnPaste.setBounds(609, 27, 78, 25);
+			btnPaste.addActionListener(guiListener);
+			btnPaste.setActionCommand("paste");
+		}
+		return btnPaste;
 	}
 	
 	
@@ -439,6 +450,7 @@ public class MainWindow extends JFrame {
 		btnDownload.setText(messages.getString("MainWindow.22")); //$NON-NLS-1$
 		btnTextOutput.setText(messages.getString("MainWindow.24")); //$NON-NLS-1$
 		lblInfo.setText(messages.getString("MainWindow.26")); //$NON-NLS-1$
+		btnPaste.setText(messages.getString("MainWindow.34")); //$NON-NLS-1$
 	}
 	
 	public void pasteAction(){
