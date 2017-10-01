@@ -8,9 +8,9 @@ import logger.Logger;
 public class GuiActionListener implements ActionListener {
 	Logger logger = null;	
 	MainWindow main = null;
-	TextOutput txtOputput = null;
+	TextOutputWindow txtOputput = null;
 	
-	public GuiActionListener(MainWindow main, TextOutput txtOputput, Logger logger){
+	public GuiActionListener(MainWindow main, TextOutputWindow txtOputput, Logger logger){
 		this.main = main;
 		this.logger = logger;
 		this.txtOputput = txtOputput;

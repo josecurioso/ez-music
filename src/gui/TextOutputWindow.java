@@ -15,7 +15,7 @@ import java.io.PrintStream;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 
-public class TextOutput extends JDialog {
+public class TextOutputWindow extends JDialog {
 	
 	private static final long serialVersionUID = 1L;
 	private JScrollPane scrollPane;
@@ -28,10 +28,10 @@ public class TextOutput extends JDialog {
 	/**
 	 * Create the dialog.
 	 */
-	public TextOutput(Logger logger) {	
+	public TextOutputWindow(Logger logger) {	
 		this.logger = logger;
 		setTitle("ez-music [text output]");
-		setIconImage(Toolkit.getDefaultToolkit().getImage(TextOutput.class.getResource("/gui/images/256x256.png")));
+		setIconImage(Toolkit.getDefaultToolkit().getImage(TextOutputWindow.class.getResource("/gui/images/256x256.png")));
 		setResizable(false);
 		setBounds(100, 100, 553, 428);
 		setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);

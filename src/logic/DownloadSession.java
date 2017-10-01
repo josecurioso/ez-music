@@ -10,13 +10,13 @@ import tools.YouTubeAPITools;
 public class DownloadSession implements Runnable{
 	
 	private ArrayList<Thread> threads = new ArrayList<Thread>();
-	private LogicMain logicMain;
+	private MainLogic logicMain;
 	private String requestURL;
 	private String requestPATH;
 	private String mode;
 	private Logger logger;
 
-	public DownloadSession(String requestURL, String requestPATH, String mode, LogicMain logicMain, Logger logger){
+	public DownloadSession(String requestURL, String requestPATH, String mode, MainLogic logicMain, Logger logger){
 		this.logicMain = logicMain;
 		this.requestURL = requestURL;
 		this.requestPATH = requestPATH;

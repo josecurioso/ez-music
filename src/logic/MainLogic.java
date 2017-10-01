@@ -5,11 +5,11 @@ import java.io.File;
 import gui.MainWindow;
 import logger.Logger;
 
-public class LogicMain {
+public class MainLogic {
 	Logger logger;
 	MainWindow main;
 	
-	public LogicMain(MainWindow main, Logger logger){
+	public MainLogic(MainWindow main, Logger logger){
 		this.logger = logger;
 		this.main = main;
 	}

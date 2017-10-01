@@ -1,4 +1,4 @@
-package gui;
+package gui.locales;
 
 import java.util.Arrays;
 import java.util.List;
@@ -6,7 +6,7 @@ import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
 public class Messages {
-	private final String BASE_NAME = "gui.messages";
+	private final String BASE_NAME = "gui.locales.messages";
 	private ResourceBundle RESOURCE_BUNDLE;
 	
 	private final List<String> languages = Arrays.asList("English", "Espa\u00f1ol");

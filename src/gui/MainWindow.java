@@ -2,21 +2,19 @@ package gui;
 
 import java.awt.Toolkit;
 import java.awt.datatransfer.DataFlavor;
-import java.awt.datatransfer.UnsupportedFlavorException;
-import java.io.IOException;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
 
-
+import gui.locales.Messages;
 import logger.Logger;
-import logic.LogicMain;
+import logic.MainLogic;
 
 import javax.swing.UIManager;
 import java.awt.Color;
-import java.awt.HeadlessException;
+import java.awt.EventQueue;
 
 import javax.swing.JLabel;
 import javax.swing.SwingConstants;
@@ -68,8 +66,8 @@ public class MainWindow extends JFrame {
 	final static ImageIcon DEFAULT_THUMBNAIL = new ImageIcon(MainWindow.class.getResource("/gui/images/mqdefault.jpg"));
 	Logger logger;
 	GuiActionListener guiListener;
-	LogicMain logicMain;
-	TextOutput txtOutput;
+	MainLogic logicMain;
+	TextOutputWindow txtOutput;
 	Messages messages;
 
 	/**
@@ -84,9 +82,10 @@ public class MainWindow extends JFrame {
 	    catch (Exception e) {
 	       // handle exception
 	    }
+		/*
 		MainWindow frame = new MainWindow();
 		frame.setVisible(true);
-		/*
+		*/
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
@@ -97,7 +96,7 @@ public class MainWindow extends JFrame {
 				}
 			}
 		});
-		*/
+		
 	}
 
 	/**
@@ -107,8 +106,8 @@ public class MainWindow extends JFrame {
 		messages = new Messages();
 		logger = new Logger();
 		guiListener = new GuiActionListener(this, txtOutput, logger);
-		logicMain = new LogicMain(this, logger);
-		txtOutput = new TextOutput(logger);
+		logicMain = new MainLogic(this, logger);
+		txtOutput = new TextOutputWindow(logger);
 		
 		setTitle("ez-music");
 		setResizable(false);
@@ -344,8 +343,8 @@ public class MainWindow extends JFrame {
 	}
 	private JComboBox<String> getComboBox() {
 		if (comboBox == null) {
-			comboBox = new JComboBox(messages.getLanguages());
-			//comboBox = new JComboBox<String>(messages.getLanguages());
+			//comboBox = new JComboBox(messages.getLanguages());
+			comboBox = new JComboBox<String>(messages.getLanguages());
 			comboBox.addActionListener(guiListener);
 			comboBox.setActionCommand("cbLanguage");
 			comboBox.setBounds(10, 638, 74, 20);
@@ -409,7 +408,7 @@ public class MainWindow extends JFrame {
 		return request;
 	}
 	
-	public LogicMain getLogicMain(){
+	public MainLogic getLogicMain(){
 		return this.logicMain;
 	}
 
