@@ -11,12 +11,14 @@ import tools.JSONTools;
 
 public class DownloaderMP3 implements Runnable{
 
+	private JSONObject info;
 	private String videoURL;
 	private String requestPATH;
 	private Logger logger;
 	
 	
-	public DownloaderMP3(String videoURL, String requestPATH, Logger logger){
+	public DownloaderMP3(JSONObject info, String videoURL, String requestPATH, Logger logger){
+		this.info = info;
 		this.videoURL = videoURL;
 		this.requestPATH = requestPATH;
 		this.logger = logger;
@@ -28,13 +30,15 @@ public class DownloaderMP3 implements Runnable{
 			optionA(videoURL, requestPATH);
 		}
 		catch(FailedDownloadException e){
-			
+			logger.log("standard", "error", "FAILED: " + videoURL);
+			/*
 			try{
 				optionB(videoURL, requestPATH);
 			}
 			catch(FailedDownloadException i){
 				logger.log("standard", "error", "FAILED: " + videoURL);
 			}
+			*/
 		}
 	}
 	
@@ -44,18 +48,16 @@ public class DownloaderMP3 implements Runnable{
 			//First part
 			
 			JSONObject data = JSONTools.GETComplex("https://www.ytbmp3.com/i/search", "{\"q\":\"" + videoURL + "\"}", 100000, "POST", "https://www.ytbmp3.com", logger);
-			String fileName = data.getJSONArray("items").getJSONObject(0).getString("title") + ".mp3";
-			String id = data.getJSONArray("items").getJSONObject(0).get("id").toString();  
+			String fileName = "";
+			//fileName = info.getString("title") + ".mp3";
+			String id = videoURL.substring(32);
 			String downloadURL = JSONTools.GETComplex("https://www.ytbmp3.com/i/download", "{\"type\":\"mp3\",\"id\":\"" + id + "\",\"bitrate\":\"320\",\"start\":\"\",\"end\":\"\"}", 100000, "POST", "https://www.ytbmp3.com", logger).getString("location");
 			
-			if(!downloadURL.contains("https")){
-				downloadURL = "https://www.ytbmp3.com" + downloadURL;
-			}
-
-			
+				
 			String result = Downloader.downloadFile(downloadURL, requestPATH, fileName, logger);
 			
 			//Second part
+			/*
 			try{
 				data = JSONTools.GET("http://www.youtubeinmp3.com/fetch/?format=JSON&video=" + videoURL, logger);
 				fileName = "";
@@ -75,14 +77,16 @@ public class DownloaderMP3 implements Runnable{
 			catch(Exception e){
 				
 			}
+			*/
 			
 		}
 		catch(Exception e){
+			e.printStackTrace();
 			throw new FailedDownloadException();
 		}
 		logger.log("standard", "info", "File downloaded on first try");
 	}
-	
+	/*
 	private void optionB(String videoURL, String requestPATH) throws FailedDownloadException{
 		try{
 			JSONObject data = JSONTools.GET("http://www.youtubeinmp3.com/fetch/?format=JSON&video=" + videoURL, logger);
@@ -103,4 +107,5 @@ public class DownloaderMP3 implements Runnable{
 		}
 		logger.log("standard", "info", "File downloaded on second try");
 	}
+	*/
 }

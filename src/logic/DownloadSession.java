@@ -3,6 +3,7 @@ package logic;
 import java.util.ArrayList;
 
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import logger.Logger;
 import tools.YouTubeAPITools;
@@ -22,13 +23,15 @@ public class DownloadSession implements Runnable{
 		this.requestPATH = requestPATH;
 		this.mode = mode;
 		this.logger = logger;
-		
 	}
 	
 	@Override
 	public void run(){		
 		if (requestURL.contains("youtube.com") && requestURL.contains("watch?v=")) {
-			download(requestURL, requestPATH);
+			try {
+				download(YouTubeAPITools.getLinkInfo(requestURL, logger), requestURL, requestPATH);
+			} catch (JSONException e) {
+			}
 		} 
 		
 		else if (requestURL.contains("youtube.com") && requestURL.contains("playlist?list=")) {
@@ -36,7 +39,7 @@ public class DownloadSession implements Runnable{
 			try{
 				videoLinks = YouTubeAPITools.getLinks(requestURL, logger);
 				for (String link : videoLinks) {
-					download(link, requestPATH);
+					download(YouTubeAPITools.getLinkInfo(link, logger), link, requestPATH);
 				}
 			}
 			catch(JSONException e){}
@@ -51,10 +54,10 @@ public class DownloadSession implements Runnable{
 		logicMain.finishDownloadSession();
 	}
 	
-	private void download(String videoURL, String requestPATH){
+	private void download(JSONObject info, String videoURL, String requestPATH){
 		Runnable r = null;
-		if(mode.equals("audio")){ r = new DownloaderMP3(videoURL, requestPATH, logger); }
-		if(mode.equals("video")){ r = new DownloaderMP4(videoURL, requestPATH, logger); }
+		if(mode.equals("audio")){ r = new DownloaderMP3(info, videoURL, requestPATH, logger); }
+		if(mode.equals("video")){ r = new DownloaderMP4(info, videoURL, requestPATH, logger); }
 		try{
 			Thread t = new Thread(r);
 			this.threads.add(t);

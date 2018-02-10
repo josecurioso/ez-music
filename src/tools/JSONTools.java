@@ -44,9 +44,9 @@ public class JSONTools {
 			connection.setRequestProperty("Accept-Language", "en-US,es-ES;q=0.8,es;q=0.6,de-DE;q=0.4,de;q=0.2,en;q=0.2");
 			connection.setRequestProperty("Origin", referer);
 			connection.setRequestProperty("Referer", referer + "/");
-			connection.setRequestProperty("X-SecID", "YGMUHRFFUVJXARM3TOBOVZDO6Y");
+			connection.setRequestProperty("X-Sec", "FOCUXSEHPDQS4NI46XIHXAU574");
 			connection.setRequestProperty("Content-Type", "application/json;charset=UTF-8");
-			connection.setRequestProperty("Cookie", "secid=YGMUHRFFUVJXARM3TOBOVZDO6Y");
+			connection.setRequestProperty("Cookie", "secid=D6PBQHTA23ALSULI55CJ3M4L2E; sec=FOCUXSEHPDQS4NI46XIHXAU574; _ga=GA1.2.413961396.1518282873; _gid=GA1.2.1261233046.1518282873; _gat=1");
 			connection.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.90 Safari/537.36");
 	        
 	        

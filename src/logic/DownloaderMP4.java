@@ -8,12 +8,14 @@ import tools.JSONTools;
 
 public class DownloaderMP4 implements Runnable{
 
+	private JSONObject info;
 	private String videoURL;
 	private String requestPATH;
 	private Logger logger;
 	
 	
-	public DownloaderMP4(String videoURL, String requestPATH, Logger logger){
+	public DownloaderMP4(JSONObject info, String videoURL, String requestPATH, Logger logger){
+		this.info = info;
 		this.videoURL = videoURL;
 		this.requestPATH = requestPATH;
 		this.logger = logger;

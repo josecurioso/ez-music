@@ -15,19 +15,36 @@ public class Downloader {
 		int BUFFER_SIZE = 8192;
 		URL url = new URL(fileURL);
 		HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        connection.setRequestMethod("GET");
+        
+		connection.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.90 Safari/537.36");
+		connection.setRequestProperty("Upgrade-Insecure-Requests", "1");
+		connection.setRequestProperty("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8");
+		connection.setRequestProperty("Accept-Encoding", "gzip, deflate, br");
+		connection.setRequestProperty("Accept-Language", "en-US,es-ES;q=0.8,es;q=0.6,de-DE;q=0.4,de;q=0.2,en;q=0.2");
+		connection.setRequestProperty("Cookie", "sec=FOCUXSEHPDQS4NI46XIHXAU574; _ga=GA1.2.413961396.1518282873; _gid=GA1.2.1261233046.1518282873");
+		
+		
 		int responseCode = connection.getResponseCode();
 		
 		//Check response code
 		if (responseCode == HttpURLConnection.HTTP_OK) {
-			String disposition = connection.getHeaderField("Content-Disposition");
+			String disposition = connection.getHeaderField("content-disposition");
 			String contentType = connection.getHeaderField("Content-Type");
 			String saveFilePath = "";
 
+			
+			
+			System.out.println(disposition);
+
+			System.out.println(fileURL);
+			
+			
 			//Check disposition
 			if(disposition == null){
 				connection.disconnect();
 				return "failed";
-			}	
+			}
 			
 			//Extract filename from disposition	if it is not provided
 			if(fileName.equals("")){
@@ -42,17 +59,6 @@ public class Downloader {
 			
 			//Assemble save path from directory and filename
 			saveFilePath = saveDir + File.separator + fileName;
-			
-			/*
-			String contentType = httpConn.getContentType();
-			
-			System.out.println("####################################################################");
-			System.out.println("Download URL = " + fileURL);
-			System.out.println("Content-Type = " + contentType);
-			System.out.println("fileName = " + fileName);
-			System.out.println("####################################################################");
-
-			*/
 			
 			logger.log("debug", "info", "####################################################################\n"
 			+ "Download URL = " + fileURL + "\n"

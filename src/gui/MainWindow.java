@@ -60,6 +60,7 @@ public class MainWindow extends JFrame {
 	private JLabel lblInfo;
 	private JComboBox<String> comboBox;
 	JButton btnPaste;
+	String[] info;
 	private final ButtonGroup buttonGroup = new ButtonGroup();
 	
 	//From here on, my atributes
@@ -367,6 +368,7 @@ public class MainWindow extends JFrame {
 	 */
 	
 	public void updateInfoPane(String[] info){
+		this.info = info;
 		textTitle.setText(info[0]);
 		textChannel.setText(info[1]);
 		textAmount.setText(info[2]);
@@ -457,5 +459,9 @@ public class MainWindow extends JFrame {
 			textLink.setText((String) Toolkit.getDefaultToolkit().getSystemClipboard().getData(DataFlavor.stringFlavor));
 		} catch (Exception e) {
 		}
+	}
+	
+	public String[] getCurrentInfo() {
+		return this.info;
 	}
 }
