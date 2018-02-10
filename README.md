@@ -26,6 +26,7 @@ This is a simple application for downloading music from youtube and getting the 
 
 ## Installation
 There's no need to install anything, everything comes in the .jar
+You can find the latest version in the [release page](https://github.com/josecurioso/ez-music/releases).
 
 
 ## Usage
@@ -68,6 +69,7 @@ Simple aplicacion para descargar musica de youtube incluyendo las etiquetas ID3.
 
 ## Instalación
 No necesitas instalar nada, todo viene en el .jar
+Puedes encontrar la última versión en la [página de descarga](https://github.com/josecurioso/ez-music/releases).
 
 
 ## Uso
